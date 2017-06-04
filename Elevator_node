@@ -1,0 +1,186 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<time.h>
+#include <hidef.h>      /* common defines and macros */
+#include "derivative.h"      /* derivative-specific definitions */
+#include "mc9s12c32.h"
+//#include "mscan.h"
+
+#define NO_ERR 0 
+#define ERR_BUFFER_FULL 1
+#define SET_BITS(port,mask) (port)|=(mask)
+#define CLR_BITS(port,mask) ((port)&=((~mask)&0xFF))
+#define ID(input) (input&0x00000FFF)<<21
+
+unsigned char CANSendFrame(unsigned long id, unsigned char priority, unsigned char length, unsigned char *txdata);
+void CANInit(unsigned int, unsigned int, unsigned int, unsigned int);
+unsigned char Check_ID ();   //Checks the id of recieved buffer
+unsigned char Check_txbuff;     //To eliminate the extra work if button is pressed twice 
+void delay(int milliseconds);
+
+
+unsigned char rxdata;
+unsigned char elevator_position;  //Elevator position to be used in 7-seg display
+unsigned char txbuff = 0x00;      //Global text buffer, will hold the information about where the elevator needs to go
+
+
+void CANInit(unsigned int filter1, unsigned int filter2, unsigned int filter3, unsigned int filter4 )
+{
+  
+  CANCTL0 = 0x01; // Enter Initialization Mode 
+  while (! (CANCTL1&0x01)) {}; // Wait for Initialization Mode
+                                 // acknowledge (INITRQ bit = 1) 
+  CANCTL1 = 0xC0;    // 
+  CANBTR0 = 0x07;
+  CANBTR1 = 0x23;
+  
+  
+  CANIDAC = 0x10;                                     // Set four 16-bit Filters
+  
+  CANIDAR0 = (filter1&0x0FF0) >> 3;                   // Upper Byte of Address
+   
+  CANIDMR0 = 0;                                       // mask for bits that matter, 0 = all matter
+  CANIDAR1 = (filter1&0x000F) << 5;                   // Lower byte of address
+  CANIDMR1 = 0;                                       // mask for bits that matter, 0 = all matter
+
+  CANIDAR2 = (filter2&0x0FF0) >> 3;                   // Upper Byte of Address
+  CANIDMR2 = 0;                                       // mask for bits that matter, 0 = all matter
+  CANIDAR3 = (filter2&0x000F) << 5;                   // Lower byte of address
+  CANIDMR3 = 0;                                       // mask for bits that matter, 0 = all matter
+
+  CANIDAR4 = (filter3&0x0FF0) >> 3;                   // Upper Byte of Address
+  CANIDMR4 = 0;                                       // mask for bits that matter, 0 = all matter
+  CANIDAR5 = (filter3&0x000F) << 5;                   // Lower byte of address
+  CANIDMR5 = 0;                                       // mask for bits that matter, 0 = all matter
+  
+  CANIDAR6 = (filter4&0x0FF0) >> 3;                    // Upper Byte of Address
+  CANIDMR6 = 0;                                       // mask for bits that matter, 0 = all matter
+  CANIDAR7 = (filter4&0x000F) << 5;                    // Lower byte of address
+  CANIDMR7 = 0;                                       // mask for bits that matter, 0 = all matter
+
+  
+  
+  
+  CANCTL0 = 0x00;   //Exit init mode 
+  while(CANCTL1&0x01);
+  
+  while(!(CANCTL0&0x10)); 
+  
+  CANRFLG = 0xC3;                                                                 
+  CANRIER = 0x01;
+  
+}      
+
+void main()
+{
+  unsigned char errorflag = NO_ERR;
+  unsigned long myID = 0x100;                  //output buffer id
+  
+  CANInit(0x0101, 0x0201, 0x202, 0x0203);     //Filters
+  
+  EnableInterrupts;
+  
+  for(;;)                                      //Loop the check id and send buffer functions
+  {
+    txbuff = Check_ID();                           //Call the function to check id
+
+    if(txbuff != Check_txbuff) {               //Only send message if new buffer is recieved
+  
+      errorflag = CANSendFrame(ID(myID), 0x00, 1, &txbuff);
+      Check_txbuff = txbuff;
+    }
+  }          
+}
+
+
+
+/**************** Check recieved message ID ************************/
+unsigned char Check_ID ()
+{
+  
+  unsigned int sender_id;     //id of the incoming msg.
+  unsigned char floor_select;
+  int upper_id = CANRXIDR0;
+  int lower_id = CANRXIDR1; 
+  lower_id = lower_id>>5;
+  //Copying the id from RXbuffer to sender_id
+  sender_id = upper_id;
+  sender_id = sender_id<<3;
+
+  sender_id = sender_id | lower_id;
+  
+
+ //Check recieved message id and set the floor select byte 
+  if (sender_id == 0x201){                             //First floor id
+       
+       floor_select = 0b00000101;
+  } 
+  if (sender_id == 0x202){                            //second floor id
+       
+       floor_select = 0b00000110;
+  } 
+  if (sender_id == 0x203){                            //third floor id
+       
+       floor_select = 0b00000111;
+  } 
+  if (sender_id == 0x101){                            //elevator control node id(thoma's board)
+                                                           //Copy the position of elevator to global variable
+       elevator_position = CANRXDSR7;
+       elevator_position = elevator_position & 0b00000011; //Use this value in display function to show the location of elevator
+       
+  }
+  
+  return floor_select;                                     //return the floor number where elevator neeeds to go
+  
+}
+
+/****************send message***********************************/
+
+unsigned char CANSendFrame(unsigned long id, unsigned char priority, unsigned char length, unsigned char *txdata)
+{ 
+  
+  unsigned char txbuffer;
+  int index = 0;
+  
+   DisableInterrupts;
+   
+  if (!CANTFLG)
+  {
+    EnableInterrupts;
+    return ERR_BUFFER_FULL;
+  }/* Is Transmit Buffer full?? */
+    
+  
+  CANTBSEL = CANTFLG; /* Select lowest empty buffer */
+  txbuffer = CANTBSEL; /* Backup selected buffer */
+  
+  /* Load Id to IDR Register */
+  *((unsigned long *) ((unsigned long)(&CANTXIDR0))) = id;
+  
+  for (index=0; index<length; index++) {
+    *(&CANTXDSR0 + index) = txdata[index]; // Load data to Tx buffer
+                                            // Data Segment Registers
+  }
+  
+  CANTXDLR = length; // Set Data Length Code 
+  CANTXTBPR = priority; // Set Priority 
+  CANTFLG = txbuffer; // Start transmission 
+  
+  while ( (CANTFLG & txbuffer) != txbuffer); // Wait for Transmission completion
+  EnableInterrupts;
+  return 0;
+}
+
+interrupt 38 void CANRxISR(void)
+{ 
+  unsigned char length, index;  
+  unsigned char rxdata[8];
+  
+  length = (CANRXDLR&0x0F);
+  for (index=0; index<length; index++) 
+  {
+    rxdata[index] = *(&CANRXDSR0 + index); // Get received data
+  }
+
+  SET_BITS(CANRFLG,0x01); // Clear RXF, and check for new messages
+}
