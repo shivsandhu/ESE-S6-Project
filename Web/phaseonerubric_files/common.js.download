@@ -1,0 +1,42 @@
+
+var previewDialog = null;
+
+function PreviewRubric(rubricId, rubricName ) {
+	
+	if( previewDialog !== null ) {
+		previewDialog.Close();
+	}
+	
+	var dialogName = Math.random().toString();
+	dialogName = 'previewRubric_' + dialogName.replace( '\.', '' );	
+	previewDialog = new D2L.NonModalDialog( dialogName );
+	var title = new D2L.LP.Text.LangTerm( 'Rubrics.Shared:ActionBar.titPreviewRubric', rubricName, Global.OrgUnitName );
+	previewDialog.SetTitle( title );
+	previewDialog.AddPrimaryButton( D2L.Control.Button.Type.Close );
+	previewDialog.SetSize( '735px', '400px' );
+	previewDialog.SetSrc( '/d2l/lp/rubrics/preview.d2l' );
+	previewDialog.SetSrcParam( 'rubricId', rubricId );
+	previewDialog.Open();
+}
+
+function DeleteRubric( rubricId ) {
+	
+	var handleConfirm = function( response ) {		
+		if( response.GetType() == D2L.Dialog.ResponseType.Positive ) {							
+			var goToList = function() {
+				var ni = new D2L.NavInfo();
+				ni.SetNavigation( 'list.d2l' );
+				Nav.Go( ni );
+			}
+			D2L.Rpc.Create( 'DeleteRubric', goToList, 'list.d2l' ).Call( rubricId );
+		}
+	};
+	var subtitle = new D2L.LP.Text.LangTerm( 'Rubrics.Shared:ActionBar.confDeleteRubricSubtitle' );	
+	var button = new D2L.LP.Text.LangTerm( 'Standard.Buttons.btnDelete' );
+	
+	var dialog = new D2L.Dialog.Confirm( 'confirmDelete', handleConfirm, subtitle );		
+	dialog.RemoveButtons();
+	dialog.AddCustomButton( button, D2L.Dialog.ButtonPosition.Left, D2L.Dialog.ResponseType.Positive, '', '', true );
+	dialog.AddButton(D2L.Control.Button.Type.Cancel);	
+	dialog.Open();
+}
