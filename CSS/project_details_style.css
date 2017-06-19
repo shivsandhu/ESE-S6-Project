@@ -1,0 +1,41 @@
+body {font-family: georgia; 
+	font-size: 100%;
+	border-width: 2px 2px 2px 2px;
+	border-style: solid solid solid solid;
+	border-color: black black black black;
+	padding: 10px 10px 10px 10px;
+	margin: 0px 475px 0px 475px
+	}
+	
+h1 {font-size: 160%;}
+
+h2 {font-size: 125%;}
+
+li {line-height: 20px; text-align: justify;}
+
+p {line-height: 20px;
+	text-indent: 15px;}
+	
+img {height: 300px;
+	width: 300px;
+	border: 2px solid blue;
+	box-shadow:10px 10px 5px gray;}
+
+figure {text-align: center;
+	font-size: 90%;
+	font-style: italic;
+	border: 2px solid green;
+	border-radius: 25px;
+	}
+
+.mkunderlined {text-decoration: underline;}
+
+.mkbold {font-weight: bold;}
+
+
+
+/	* { margin: 0; padding: 0; border: none;}
+li.h_menu{display: inline; padding: 5px;}
+#header {position: fixed; width: 925px; z-index:100; background-color: lightgray; text-align: center; border: 1px solid black;}
+
+/#header_menu {position: absolute; bottom: 150px; left: 185px;}
