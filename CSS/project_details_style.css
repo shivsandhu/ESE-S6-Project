@@ -1,6 +1,5 @@
 body {font-family: georgia;
-	background-image: url("./Images/background.jpeg");
-    	background-repeat: no-repeat;
+	background-color: gray;
 	font-size: 100%;
 	border-width: 2px 2px 2px 2px;
 	border-style: solid solid solid solid;
@@ -18,8 +17,8 @@ li {line-height: 20px; text-align: justify;}
 p {line-height: 20px;
 	text-indent: 15px;}
 	
-img {height: 300px;
-	width: 300px;
+img {height: 150px;
+	width: 150px;
 	border: 2px solid blue;
 	box-shadow:10px 10px 5px gray;}
 
