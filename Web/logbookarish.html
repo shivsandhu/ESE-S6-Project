@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+                       <title>Logbook</title>
+	</head>
+	<body>
+		<h1>Weekly Log Book - Arish Ghaderi</h1>
+		<h2>Week 1</h2>
+		<ul>
+			<li>Learned about CAN 
+			<li>Set up CAN wires for communication testing
+		</ul>
+		<h2>Week 2</h2>
+		<ul>
+			<li>Thursday - Read through the AN3034 instruction to put the CAN into the Loop back mode, but the code seemed buggy, wrote the code with 8 MHz Bus clock, code has bugs. 
+			<li>Friday - Still was not able to get the code working. Posted the code. This code is only meant for testing the send/receive. Had to remove all comments, for some reason comments gave me errors. 
+		</ul>
+		<h2>Week 3</h2>
+		<ul>
+			<li>Tuesday - Got the Code working, transition and receiving in Loopback mode function fine. Transition to PCAN is also working. Can not receive anything from the PCAN just yet
+			<li>Wednesday - Receiving from the PCAN is not working. All the code seems to be set up right.
+			<li>Thursday - MLD also started his own code, but did not work. Switched Axemans several times, same problem. Nothing is received. 
+			<li>Friday - Took Mike Akl’s code to verify the setup. Even mike Akl’s code does not receive. Interrupts are not fired! No receiver Flag register’s get set.
+			<li>Sunday - MLD and I worked on the code, tried re-writing it , nothing works. Bus is always heavy on PCAN software, (doesn’t seem to be an issue with other groups thou)
+		</ul>
+		<h2>Week 4</h2>
+		<ul>
+			<li>Monday - Team meeting at 5. Akem was to write the code between Axmans and Shiv is suppose to write the code for the nodes, including the floor display and elevator call buttons. Arish assist Akem, and MLD assist Shiv. 
+			<li>Tuesday - Acceptance filters do not get set correctly as described by Ap-note. The location of the four bytes holding the acceptance filters don’t seem to follow the datasheet!! Mike and I replaced the code for the acceptance filter 0,1. The numbers are shifted into the right place, but the receiving function does not recognize any incoming msgs based on acceptance ID.
+			<li>Wednesday - the Sending buffer is now able to send msgs with different IDs. This is only received on the Pcan for now. Just insert the ID variable with different numbers in main. 
+			<li>Thursday - Spent 6 hours with MLD on receiving massages with axmen. The acceptance filters still do not work. The code for these filters will be hard coded into the axmen individually. The acceptance filters work between a certain range. Ie : acceptance filter 100-105 (1-5) work, anything about 105 does not! Something is not shifter into the right place. 
+			<li>Friday - Did not come to school as I tried to study for math.
+			<li>Sunday - Came to school to work with Akem to get the communication between Axmen working. Once again we wrote the acceptance filters, shifting function.
+			
+		</ul>
+		<h2>Week 5</h2>
+		<ul>
+			<li>Monday - Set up the Axmen (hardware ) with buttons and LEDs, wrote a function for floor node’s elevator level. Did not work! Akem took over and made it work. Setup Axmen all connected to PCAN and everything for complete testing. 
+		</ul>
+	</body>
+</html>

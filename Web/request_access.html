@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Form: Request Access</title>
+		<link href="css/request_access_stylesheet.css" type="text/css" rel="stylesheet">
+	</head>
+	<body>
+	
+			<h1>Request Access</h1>
+			<form action="php/request_acc.php" method="post" id="access">
+			<fieldset>
+				<legend>Contact Details</legend>
+				<div>
+				<label for="user" class="text_label">First Name:</label>
+				<input id="firstname" type="text" class="text_input" name="fistname" />
+				</div>
+				<div>
+				<label for="user" class="text_label">Last Name:</label>
+				<input id="lastname" type="text" class="text_input" name="lastname" />
+				</div>
+				<div>
+				<label for="user" class="text_label">Email:</label>
+				<input id="Email" type="email" class="text_input" name="email" />
+				</div>
+				<div>
+				<label for="user" class="text_label">Website:</label>
+				<input id="website" type="url" class="text_input" name="url" />
+				</div>
+				<div>
+				<label for="user" class="text_label">Date of birth:</label>
+				<input id="birthday" type="date" class="text_input" name="birthday" />
+				</div>
+				<div>
+				<label for="user" class="text_label">Faculty</label>
+				<input id="faculty" type="radio" class="radio_input" name="fac_or_student" />
+				<label for="user" class="radio_label">Student</label>
+				<input id="student" type="radio" class="radio_input" name="fac_or_student" />
+				</div>
+				
+				
+			</fieldset>
+				
+				<p>I currently ... (check all that apply)</p>
+				<label><input type="checkbox" name="involvement" value="none" /> Have no involvement in Project </label> <br/>
+				<label><input type="checkbox" name="involvement" value="instructor" /> An instructor in this Project </label> <br/>
+				<label><input type="checkbox" name="involvement" value="instructor_other" /> An instructor in a different Project </label> <br/>
+				<label><input type="checkbox" name="involvement" value="student" /> A student in this Project </label> <br/>
+				<label><input type="checkbox" name="involvement" value="student_other" /> A student in a different Project </label> <br/>
+				<label><input type="checkbox" name="involvement" value="admin" /> A College Administrator </label> <br/>
+				<label><input type="checkbox" name="involvement" value="external" /> An external reviewer </label> <br/>
+				
+			<p>Tell us a bit about yourself</p>
+			<textarea>Other details ...</textarea>
+			<div><a href="index.html" class="button">Submit</a></div>
+			</form>
+	</body>
+</html>
