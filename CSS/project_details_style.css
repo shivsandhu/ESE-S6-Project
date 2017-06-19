@@ -1,5 +1,6 @@
 body {font-family: georgia;
-	background-color: tan;
+	background-image: url("./Images/background.jpeg");
+    	background-repeat: no-repeat;
 	font-size: 100%;
 	border-width: 2px 2px 2px 2px;
 	border-style: solid solid solid solid;
