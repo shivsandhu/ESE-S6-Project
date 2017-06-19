@@ -4,7 +4,8 @@ body {font-family: georgia;
 	border-style: solid solid solid solid;
 	border-color: black black black black;
 	padding: 10px 10px 10px 10px;
-	margin: 0px 475px 0px 475px
+	margin: 0px 475px 0px 475px;
+	background-color: gray;
 	}
 	
 h1 {font-size: 160%;}
