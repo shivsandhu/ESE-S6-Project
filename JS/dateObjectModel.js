@@ -10,4 +10,4 @@ var element = document.getElementById('info');
 element.innerHTML = msg;
 
 var ft = document.getElementById('foot');
-ft.innerHTML = '<p>Copyright &copy' + year + '</p>';
+ft.innerHTML = '<p>Copyright &copy' + year + 'Shiv Sandhu</p>';
