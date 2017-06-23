@@ -5,10 +5,42 @@
 		<meta name="description" content="This is the Home page" />
 		<meta name="robots" content="" />
 		<meta http-equiv="author" content="Shiv Sandhu" />
-		<meta http-equiv="pragma" content="no-cache" />
-		<link href="./CSS/project_details_style.css" type="text/css" rel="stylesheet">
+		<meta http-equiv="pragma" content="no-cache">
+		<meta charset="uft-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link rel="stylesheet" href"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js" /></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" /></script>
+		<link href="css/project_details_style.css" type="text/css" rel="stylesheet">
 	</head>
 	<body>
+	<div id="page" class="container-fluid">
+		<header>
+			<div class="row">
+				<div class="col-xs-4">
+					<id="top"><img src="./Images/teamlogo.png" alt="Team logo" title="Team logo" width="50"/>
+				</div>
+				<div class="col-xs-8">
+					<nav>
+						<ul id="header_menu">
+							<li class="h_menu"><a href="about.html" target="_blank">About Page</a>
+							<li class="h_menu"><a href="login.html" target="_blank">Elevator Control</a>
+							<li class="h_menu"><a href="logbookpage.html" target="_blank">Log books</a>
+							<li class="h_menu"><a href="sourcecode.html" target="_blank">Source Code</a>
+							<li class="h_menu"><a href="projectdetails.html" target="_blank">Project Details</a>
+						</ul>
+					</nav>
+				</div>
+			</div>
+		</header>
+		
+		<h1>Today's date and time:</h1>
+		<p id="date"></p>
+		<script>
+		var d = new Date();
+		document.getElementById("date").innerHTML = d;
+		</script>
+		
 		<h1>Semester 6 Project: CAN Elevator!</h1>
 		<p>Welcome to the home page for <b>Semester 6 Project</b>.<br/>
 		On this page you will be able to access all of the project files. </p>
@@ -20,6 +52,8 @@
 			<li><a href="http://google.ca" target="_blank">Source Code</a>
 			</ul>
 		<hr/>
-		<p><b> Copyright &copy - Shiv Sandhu </b></p>
+	<footer id='foot'><p id='info'> This shows date: </p></footer>
+	<script src="JS/dateObjectModel.js"></script>
+	</div>
 	</body>
 </html>
