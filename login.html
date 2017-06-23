@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Form: Login Page</title>
+		<meta charset="uft-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<link href="css/request_access_stylesheet.css" type="text/css" rel="stylesheet">
+	</head>
+	<body>
+	<div id="page">
+		<form action="php/login.php" method="post" id="login">
+			<h1>Please Log in</h1>
+			<div>
+				<label for="username" class="text_label">Username:</label>
+				<input id="username" type="text" class="text_input" name="username" />
+			</div>
+			<div>
+				<label for="pass" class="text_label">Password:</label>
+				<input id="pass" type="password" class="text_input" name="password" required />
+			</div>
+					
+			<div><input type="submit" value="Log in" id="submit"/>
+			<a href="request_access.html" class="button">Request Access</a></div>
+			<div>
+				<p>Error Messsages:</p>
+				<p id="feedback"></p>
+			</div>
+		</form>
+		<script src="JS/eventlistener.js"></script>
+		<footer id='foot'><p id='info'> This shows date: </p></footer>
+	<script src="JS/dateObjectModel.js"></script>
+	</body>
+</html>
