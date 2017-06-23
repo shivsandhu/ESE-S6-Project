@@ -5,79 +5,123 @@
 		<meta name="description" content="This is the about page for our project" />
 		<meta name="robots" content="" />
 		<meta http-equiv="author" content="Shiv Sandhu" />
-		<meta http-equiv="pragma" content="no-cache" />
+		<meta http-equiv="pragma" content="no-cache">
+		<meta charset="uft-8"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<link href="./CSS/project_details_style.css" type="text/css" rel="stylesheet">
 	</head>
 	<body>
-	<div id="page">
-		<div id="header">
-			<ul id="header_menu">
-				<li class="h_menu"><a href="about.html" target="_blank">About Page</a>
-				<li class="h_menu"><a href="login.html" target="_blank">Elevator Control</a>
-				<li class="h_menu"><a href="logbookpage.html" target="_blank">Log books</a>
-				<li class="h_menu"><a href="sourcecode.html" target="_blank">Source Code</a>
-				<li class="h_menu"><a href="projectdetails.html" target="_blank">Project Details</a>
-			</ul>
+	<div id="page" class="container-fluid">
+		<header>
+			<div class="row">
+				<div class="col-xs-4">
+					<id="top"><img src="./Images/teamlogo.png" alt="Team logo" title="Team logo" width="50"/>
+				</div>
+				<div class="col-xs-8">
+					<nav>
+						<ul id="header_menu">
+							<li class="h_menu"><a href="about.html" target="_blank">About Page</a>
+							<li class="h_menu"><a href="login.html" target="_blank">Elevator Control</a>
+							<li class="h_menu"><a href="logbookpage.html" target="_blank">Log books</a>
+							<li class="h_menu"><a href="sourcecode.html" target="_blank">Source Code</a>
+							<li class="h_menu"><a href="projectdetails.html" target="_blank">Project Details</a>
+						</ul>
+					</nav>
+				</div>
+			</div>
+		</header>
+		<div id="content">
+		<article>
+			<section>
+			<div class="row">
+				<div class="col-xs-12">
+					<h1>Today's date and time:</h1>
+					p id="date"></p>
+					<script>
+						var d = new Date();
+						document.getElementById("date").innerHTML = d;
+					</script>
+					<h1>Semester 6 Project: Elevator CAN Design</h1>
+					<p>Welcome to the information page for <b>Semester 6 Project</b>.<br/>
+					On this page you will find the overview of the project and the planning that goes along with it.</p>
+					<hr/>
+					<ul>
+					<li><a href="http://google.ca" target="_blank">What is a CAN</a>
+					<li><a href="projectplan.html" target="_blank">Project Plan</a>
+					<li><a href="logbookpage.html" target="_blank">Log books</a>
+					<li><a href="http://google.ca" target="_blank">Work Demonstration</a>
+				</div>
+			</div>
+			</section>
+		</article>
+		<article>
+			<section>
+			<div class ="row">
+				<div class="col-xs-12">
+					<h2>Purpose</h2>
+					<p>To create an elevator that demonstrates the usage of CAN for communication between nodes on seperate floors, elevator node and also a connection with a logic node.
+					Follow this <i><a href="flowdiagram.html" target="_blank">link</a></i> to a flow diagram of how the system is connected.</p>
+					Follow this <i><a href="canprotocol.html" target="_blank">link</a></i> to the protocol design diagram.</p>
+					Follow this <i><a href="harewaredesign.html" target="_blank">link</a></i> to the hardware design for each node.</p>
+					<hr/>
+				</div>
+			</div>	
+			</section>
+		</article>
+		<article>
+			<section>
+				<div class="row">
+					<div class="col-xs-6">
+						<h2>Our Team</h2>
+						<h3>Mike Lynne-Davis</h3>
+						<ul>
+						<li>Configuration of database used by the state machine
+						<li>Setting up PCAN to communicated with the CAN network
+						<li>Assisting in the creating of a user GUI for elevator control
+						<li>Assisting with the CAN node setup for all nodes
+						</ul>
+						<h3>Shiv Sandhu</h3>
+						<ul>
+						<li>Creating a Webpage for the project with integration to LogBooks and other project needs (<b>This one!</b>)
+						<li>Creating the flow diagram for the CAN system
+						<li>Designing and implimenting the push buttons and LEDs connected to each floor and elevator
+						<li>Reading the position sensor to determine which floor the elevator is on, and displaying on 7-segment display
+						<li>Translating the button press to LED on/off
+						<li>Translating the button press to a bit being sent out for CAN protocol configutaion
+						</ul>
+						<h3>Arish Ghaderi</h3>
+						<ul>
+						<li>Setting up the CAN network hardware
+						<li>Testing PCAN to microcontrolled communication
+						<li>Designing and testing CAN communication with multiple nodes
+						</ul>
+						<h3>Akem Dhaliwal</h3>
+						<ul>
+						<li>Translating the bits receieved from Shiv to CAN Protocol
+						<li>Creating a protocol design that will be used in the project
+						<li>Creating a test document
+						<li>Designing and implemation of the state machine to process the logic for the elevator
+						</ul>
+						<hr/>
+					</div>
+					<div class="col-xs-6">
+						<h2>Our Campus</h2>
+						<p>Below is a map of our school</p>
+						<iframe
+							width="450"
+							height="300"
+							src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d11597.640189071937!2d-80.4088439!3d43.3893582!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x2043c24369ede07e!2sConestoga+College!5e0!3m2!1sen!2sca!4v1497483369575"
+						allowfullscreen
+						seamless>
+						</iframe>
+					</div>
+				</div>
+			<section>
+		<article>
 		</div>
-		<hr/>
-		<h1><id="top"><img src="./Images/teamlogo.png" alt="Team logo" title="Team logo" width="50" />Semester 6 Project: Elevator CAN Design</h1>
-		<p>Welcome to the information page for <b>Semester 6 Project</b>.<br/>
-		On this page you will find the overview of the project and the planning that goes along with it.</p>
-		<hr/>
-			<ul>
-			<li><a href="http://google.ca" target="_blank">What is a CAN</a>
-			<li><a href="projectplan.html" target="_blank">Project Plan</a>
-			<li><a href="logbookpage.html" target="_blank">Log books</a>
-			<li><a href="http://google.ca" target="_blank">Work Demonstration</a>
-			<li>
-		<h2>Purpose</h2>
-		<p>To create an elevator that demonstrates the usage of CAN for communication between nodes on seperate floors, elevator node and also a connection with a logic node.
-		Follow this <i><a href="flowdiagram.html" target="_blank">link</a></i> to a flow diagram of how the system is connected.</p>
-		Follow this <i><a href="canprotocol.html" target="_blank">link</a></i> to the protocol design diagram.</p>
-		Follow this <i><a href="harewaredesign.html" target="_blank">link</a></i> to the hardware design for each node.</p>
-		<hr/>
-		<h2>Our Team</h2>
-		<h3>Mike Lynne-Davis</h3>
-			<ul>
-			<li>Configuration of database used by the state machine
-			<li>Setting up PCAN to communicated with the CAN network
-			<li>Assisting in the creating of a user GUI for elevator control
-			<li>Assisting with the CAN node setup for all nodes
-			</ul>
-		<h3>Shiv Sandhu</h3>
-			<ul>
-			<li>Creating a Webpage for the project with integration to LogBooks and other project needs (<b>This one!</b>)
-			<li>Creating the flow diagram for the CAN system
-			<li>Designing and implimenting the push buttons and LEDs connected to each floor and elevator
-			<li>Reading the position sensor to determine which floor the elevator is on, and displaying on 7-segment display
-			<li>Translating the button press to LED on/off
-			<li>Translating the button press to a bit being sent out for CAN protocol configutaion
-			</ul>
-		<h3>Arish Ghaderi</h3>
-			<ul>
-			<li>Setting up the CAN network hardware
-			<li>Testing PCAN to microcontrolled communication
-			<li>Designing and testing CAN communication with multiple nodes
-			</ul>
-		<h3>Akem Dhaliwal</h3>
-			<ul>
-			<li>Translating the bits receieved from Shiv to CAN Protocol
-			<li>Creating a protocol design that will be used in the project
-			<li>Creating a test document
-			<li>Designing and implemation of the state machine to process the logic for the elevator
-			</ul>
-		<hr/>
-		<h2>Our Campus</h2>
-		<p>Below is a map of our school</p>
-		<iframe
-			width="450"
-			height="300"
-			src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d11597.640189071937!2d-80.4088439!3d43.3893582!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x2043c24369ede07e!2sConestoga+College!5e0!3m2!1sen!2sca!4v1497483369575"
-			allowfullscreen
-			seamless>
-		</iframe>
-		<hr/>
-		<p><b> Copyright &copy - Shiv Sandhu </b></p>
+	</div>
+	<footer id='foot'><p id='info'> This shows date: </p></footer>
+	<script src="JS/dateObjectModel.js"></script>
 	</div>
 	</body>
 </html>
