@@ -2,10 +2,12 @@
 <html>
 	<head>
 		<title>Form: Request Access</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta charset="uft-8"/>
 		<link href="./CSS/request_access_stylesheet.css" type="text/css" rel="stylesheet">
 	</head>
 	<body>
-	
+	<div id="page">
 			<h1>Request Access</h1>
 			<form action="php/request_acc.php" method="post" id="access">
 			<fieldset>
@@ -49,9 +51,27 @@
 				<label><input type="checkbox" name="involvement" value="admin" /> A College Administrator </label> <br/>
 				<label><input type="checkbox" name="involvement" value="external" /> An external reviewer </label> <br/>
 				
+
+				
 			<p>Tell us a bit about yourself</p>
-			<textarea>Other details ...</textarea>
-			<div><a href="index.html" class="button">Submit</a></div>
+				<p id="limit"></p>
+				<script type="text/javascript">
+				function countChars(countfrom,displayto) {
+				  var len = 180 - document.getElementById(countfrom).value.length;
+				  document.getElementById(displayto).innerHTML = len;
+				  if(len==0){
+					document.getElementById("limit").innerHTML = "Limit is only 180 characters";
+				  }
+				}
+				</script>
+
+				<textarea id="data" cols="40" rows="5"
+				onkeyup="countChars('data','charcount');" onkeydown="countChars('data','charcount');" onmouseout="countChars('data','charcount');"></textarea><br>
+				<span id="charcount">180</span> characters entered.
+					<div><a href="index.html" class="button">Submit</a></div>
 			</form>
+	<footer id='foot'><p id='info'> This shows date: </p></footer>
+	<script src="JS/dateObjectModel.js"></script>
+	</div>
 	</body>
 </html>
