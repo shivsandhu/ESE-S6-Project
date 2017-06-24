@@ -5,11 +5,43 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<meta charset="uft-8"/>
 		<link href="./CSS/request_access_stylesheet.css" type="text/css" rel="stylesheet">
+		
+		<script>
+			function validateForm() {
+				var x = document.forms["myForm"]["firstname"].value;
+				if (x == "") {
+					alert("First Name must be filled out");
+					return false;
+				}
+				var x = document.forms["myForm"]["lastname"].value;
+				if (x == "") {
+					alert("Last Name must be filled out");
+					return false;
+				}
+				var x = document.forms["myForm"]["email"].value;
+				if (x == "") {
+					alert("Email must be filled out");
+					return false;
+				}
+				var x = document.forms["myForm"]["url"].value;
+				if (x == "") {
+					alert("Website link must be filled out");
+					return false;
+				}
+				var x = document.forms["myForm"]["birthday"].value;
+				if (x == "") {
+					alert("Date of Birth must be filled out");
+					return false;
+				}
+				}
+		</script>	
+		
+		
 	</head>
 	<body>
 	<div id="page">
 			<h1>Request Access</h1>
-			<form action="php/request_acc.php" method="post" id="access">
+			<form name="myForm" action="index.html" onsubmit="return validateForm()" method="post" >
 			<fieldset>
 				<legend>Contact Details</legend>
 				<div>
@@ -30,7 +62,7 @@
 				</div>
 				<div>
 				<label for="user" class="text_label">Date of birth:</label>
-				<input id="birthday" type="date" class="text_input" name="birthday" />
+				<input id="datetime-local" type="date" class="text_input" name="birthday" />
 				</div>
 				<div>
 				<label for="user" class="text_label">Faculty</label>
@@ -68,10 +100,11 @@
 				<textarea id="data" cols="40" rows="5"
 				onkeyup="countChars('data','charcount');" onkeydown="countChars('data','charcount');" onmouseout="countChars('data','charcount');"></textarea><br>
 				<span id="charcount">180</span> characters entered.
-					<div><a href="index.html" class="button">Submit</a></div>
+				<div><input type="submit" value="Request Access"></div>
 			</form>
-	<footer id='foot'><p id='info'> This shows date: </p></footer>
-	<script src="JS/dateObjectModel.js"></script>
+	<footer>
+		<p><b> Copyright &copy - ASMA </b></p>
+	</footer>
 	</div>
 	</body>
 </html>
