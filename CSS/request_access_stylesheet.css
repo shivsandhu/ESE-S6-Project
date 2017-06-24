@@ -8,6 +8,11 @@ legend{
 	color: white;
 	border-radius: 8px;
 	padding: 8px 20px;}
+
+#limit{
+    font-size: 40px;
+    color: red;
+    }
 	
 textarea{background-image: url("./Images/teamlogo.png");
 	background-size: 80px;
@@ -29,14 +34,20 @@ a.button{
 	font-size: 16px;
 }
 
-
-
-a.button:hover{
+input[type="submit"]{
 	background-color: blue;
+    border-radius: 50px;
+    width: 200px;
+    height: 60px;
+    font-size: 20px;
 }
 
-a.button:active{
-	background-color: purple;
+input[type="submit"]:hover{
+	background-color: coral;
+}
+
+input[type="submit"]:active{
+	background-color: green;
 }
 
 .text_label{
@@ -55,4 +66,4 @@ a.button:active{
 div{ padding:10px 0px 10px 0px;
 	}
 
-#submit {float: right;}
+#submit {float: left;}
