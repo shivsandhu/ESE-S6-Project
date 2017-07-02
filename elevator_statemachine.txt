@@ -1,0 +1,423 @@
+#include<stdio.h>
+#include<stdlib.h>
+#include<time.h>
+#include <hidef.h>      /* common defines and macros */
+#include "derivative.h"      /* derivative-specific definitions */
+#include "mc9s12c32.h"
+
+#define NO_ERR 0 
+#define ERR_BUFFER_FULL 1
+#define SET_BITS(port,mask) (port)|=(mask)
+#define CLR_BITS(port,mask) ((port)&=((~mask)&0xFF))
+#define ID(input) (input&0x00000FFF)<<21
+
+
+#define FLOOR1_LED PTT_PTT0
+#define FLOOR2_LED PTT_PTT1
+#define FLOOR3_LED PTT_PTT2
+#define DoorOpen_LED PTT_PTT3
+#define DoorClosed_LED PTT_PTT4
+
+#define Elevator_Button_Status PTJ
+#define Elevator_Button_Status2 PTAD 
+#define Elevator_button_FL1 0b10000000
+#define Elevator_button_FL2 0b01000000
+#define Elevator_button_FL3 0b10000001
+#define DOPN_button 0b10000010
+#define DCLS_button 0b10000100
+#define ON 1
+#define OFF 0
+
+#define Position_LED_Floor1 PTT_PTT5
+#define Position_LED_Floor2 PTT_PTT6
+#define Position_LED_Floor3 PTT_PTT7
+
+
+#define GOTOFLOOR1 0b00000101;
+#define GOTOFLOOR2 0b00000110;
+#define GOTOFLOOR3 0b00000111;
+
+
+
+volatile unsigned char ELEVATOR_INPUT = 0;
+
+volatile unsigned char rxdata[8];
+volatile unsigned char elevator_position;  //Elevator position to be used in 7-seg display
+
+unsigned int accepted_ID[4] = {0x0101, 0x0201, 0x202, 0x0203}; 
+
+unsigned char OneU_mask = 0x01;
+unsigned char TwoU_mask = 0x02;
+unsigned char TwoD_mask = 0x04;
+unsigned char ThreeD_mask = 0x08;
+unsigned char UpDown_mask = 0x02;
+
+unsigned char reset = 0xF0;
+unsigned char emergency_stop = 0xFF;
+unsigned long myID;
+volatile unsigned char state_output = 0;
+volatile unsigned char state_prev = 0;
+
+void statemachine(void);
+unsigned char CANSendFrame(unsigned long id, unsigned char priority, unsigned char length, unsigned char *txdata);
+void CANInit(unsigned int, unsigned int, unsigned int, unsigned int);
+unsigned char Check_ID ();   //Checks the id of recieved buffer
+volatile unsigned char Check_txbuff=0x00;     //To eliminate the extra work if button is pressed twice 
+volatile unsigned  int sender_id;     //id of the incoming msg.
+void delay(int milliseconds);
+void set_moving_flags(void);
+void clear_moving_flags(void);
+void inti_stuff(void);
+void button_input(void);
+void update_position_LED(void);
+
+
+  
+
+
+
+void main()
+{
+    
+  inti_stuff();
+  CANInit(accepted_ID[0], accepted_ID[1], accepted_ID[2], accepted_ID[3]);     //Filters
+  EnableInterrupts;
+  
+  for(;;)                                      //Loop the check id and send buffer functions
+  {
+    
+    set_moving_flags();
+	  statemachine();
+	  button_input();
+	  clear_moving_flags();
+	  update_position_LED();
+	
+  }          
+}
+
+void update_position_LED(void)
+{
+if(elevator_position == 0x01) {
+  Position_LED_Floor1 = ON;
+  Position_LED_Floor2 = OFF;
+  Position_LED_Floor3 = OFF;
+}
+if(elevator_position == 0x02) {
+  Position_LED_Floor1 = OFF;
+  Position_LED_Floor2 = ON;
+  Position_LED_Floor3 = OFF;
+}
+if(elevator_position == 0x03) {
+  Position_LED_Floor1 = OFF;
+  Position_LED_Floor2 = OFF;
+  Position_LED_Floor3 = ON;
+}
+  
+}
+
+void button_input(void)
+{
+	if( (Elevator_Button_Status2 == DOPN_button) && (elevator_position))
+	{
+		DoorClosed_LED = OFF;
+		DoorOpen_LED = ON;
+	}
+	
+	if( Elevator_Button_Status2 == DCLS_button)
+	{
+		DoorClosed_LED = ON;
+		DoorOpen_LED = OFF;
+	}
+	
+	if( Elevator_Button_Status2 == Elevator_button_FL3)
+	{
+	  DoorOpen_LED = OFF;      
+      DoorClosed_LED  = ON;      
+      ELEVATOR_INPUT |= ThreeD_mask;
+      FLOOR3_LED = ON;
+	}
+	
+    if(Elevator_Button_Status == Elevator_button_FL1) {        //if button 1 is pushed
+      DoorOpen_LED = OFF;      
+      DoorClosed_LED  = ON;      
+      ELEVATOR_INPUT |= OneU_mask;
+      FLOOR1_LED = ON;
+    }
+	if(Elevator_Button_Status == Elevator_button_FL2) {        //if button 2 is pushed
+      DoorOpen_LED = OFF;      
+      DoorClosed_LED  = ON;      
+      ELEVATOR_INPUT |= (TwoD_mask|TwoU_mask);
+      FLOOR2_LED = ON;
+    }
+}
+
+
+void inti_stuff(void)
+{
+  myID = 0x100;                  //output buffer id
+  
+  
+  DDRT = 0xFF;   //Direction register for port T, for 2 LEDs
+  DDRJ = 0x00;   //push button as input
+  ATDDIEN = 0xFF;
+  DDRAD = 0x00;
+}
+ 
+void CANInit(unsigned int filter1, unsigned int filter2, unsigned int filter3, unsigned int filter4 )
+{
+  
+  CANCTL0 = 0x01; // Enter Initialization Mode 
+  while (! (CANCTL1&0x01)) {}; // Wait for Initialization Mode
+                                 // acknowledge (INITRQ bit = 1) 
+  CANCTL1 = 0xC0;    // 
+  CANBTR0 = 0x07;
+  CANBTR1 = 0x23;
+  
+  
+  CANIDAC = 0x10;                                     // Set four 16-bit Filters
+  
+  CANIDAR0 = (filter1&0x0FF0) >> 3;                   // Upper Byte of Address
+   
+  CANIDMR0 = 0;                                       // mask for bits that matter, 0 = all matter
+  CANIDAR1 = (filter1&0x000F) << 5;                   // Lower byte of address
+  CANIDMR1 = 0;                                       // mask for bits that matter, 0 = all matter
+
+  CANIDAR2 = (filter2&0x0FF0) >> 3;                   // Upper Byte of Address
+  CANIDMR2 = 0;                                       // mask for bits that matter, 0 = all matter
+  CANIDAR3 = (filter2&0x000F) << 5;                   // Lower byte of address
+  CANIDMR3 = 0;                                       // mask for bits that matter, 0 = all matter
+
+  CANIDAR4 = (filter3&0x0FF0) >> 3;                   // Upper Byte of Address
+  CANIDMR4 = 0;                                       // mask for bits that matter, 0 = all matter
+  CANIDAR5 = (filter3&0x000F) << 5;                   // Lower byte of address
+  CANIDMR5 = 0;                                       // mask for bits that matter, 0 = all matter
+  
+  CANIDAR6 = (filter4&0x0FF0) >> 3;                    // Upper Byte of Address
+  CANIDMR6 = 0;                                       // mask for bits that matter, 0 = all matter
+  CANIDAR7 = (filter4&0x000F) << 5;                    // Lower byte of address
+  CANIDMR7 = 0;                                       // mask for bits that matter, 0 = all matter
+
+  
+  
+  
+  CANCTL0 = 0x00;   //Exit init mode 
+  while(CANCTL1&0x01);
+  
+  while(!(CANCTL0&0x10)); 
+  
+  CANRFLG = 0xC3;                                                                 
+  CANRIER = 0x01;
+  
+}    
+
+void clear_moving_flags(void)
+{
+
+if( ((state_output&(0x03)) == elevator_position))
+	{
+	if(elevator_position==1)
+		{
+			DoorClosed_LED = OFF;
+			DoorOpen_LED = ON;
+			CLR_BITS(ELEVATOR_INPUT, OneU_mask);
+			FLOOR1_LED = OFF;
+		}
+	if(elevator_position==2)
+		{
+			DoorClosed_LED = OFF;
+			DoorOpen_LED = ON;
+			CLR_BITS(ELEVATOR_INPUT, TwoD_mask|TwoU_mask);
+			FLOOR2_LED = OFF;
+		}
+	if(elevator_position==3)
+		{
+			DoorClosed_LED = OFF;
+			DoorOpen_LED = ON;
+			CLR_BITS(ELEVATOR_INPUT, ThreeD_mask);
+			FLOOR2_LED = OFF;
+		}
+
+	
+	}
+}
+  
+
+void statemachine(void) 
+{
+if(ELEVATOR_INPUT == (TwoD_mask|TwoU_mask))
+{
+	if(elevator_position>2)
+	{
+		CLR_BITS(ELEVATOR_INPUT, TwoU_mask);
+	}
+	else
+	{
+		CLR_BITS(ELEVATOR_INPUT, TwoD_mask);
+	}
+	
+}
+
+if(ELEVATOR_INPUT == OneU_mask)
+{
+	state_output = GOTOFLOOR1;
+}
+
+if(ELEVATOR_INPUT == TwoD_mask)
+{
+	state_output = GOTOFLOOR2;
+}
+
+if(ELEVATOR_INPUT == TwoU_mask)
+{
+	state_output = GOTOFLOOR2;
+}
+
+if(ELEVATOR_INPUT == ThreeD_mask)
+{
+	state_output = GOTOFLOOR3;
+}
+
+if(ELEVATOR_INPUT == (OneU_mask|TwoD_mask))
+{
+	if(elevator_position==0x01)
+	{
+	state_output = GOTOFLOOR1;
+	}
+	else
+	{
+	state_output = GOTOFLOOR2;
+	}
+}
+
+if(ELEVATOR_INPUT == (OneU_mask|TwoU_mask))
+{
+	state_output = GOTOFLOOR1;
+}
+
+if(ELEVATOR_INPUT == (OneU_mask|ThreeD_mask))
+{
+	if(elevator_position==0x03)
+	{
+	state_output = GOTOFLOOR3;
+	}
+	else
+	{
+	state_output = GOTOFLOOR1;
+	}
+}
+
+if(ELEVATOR_INPUT == (OneU_mask|TwoU_mask|ThreeD_mask))
+{
+	state_output = 0x04|elevator_position;//current position
+}
+
+if(ELEVATOR_INPUT == (OneU_mask|TwoD_mask|ThreeD_mask))
+{
+	state_output = 0x06|elevator_position; //if!1 goto three, else 1
+}
+
+if(ELEVATOR_INPUT == (TwoD_mask|ThreeD_mask))
+{
+	state_output = GOTOFLOOR3;
+}
+if(ELEVATOR_INPUT == (TwoU_mask|ThreeD_mask))
+{
+	if(elevator_position==0x03)
+	{
+		state_output = GOTOFLOOR3;
+	}
+	else
+	{
+		state_output = GOTOFLOOR2;
+	}
+}
+
+if(state_prev != state_output)
+{
+while(CANSendFrame(ID(myID), 0x00, 1, &state_output)){};
+}
+
+state_prev = state_output;
+}
+
+/****************send message***********************************/
+
+unsigned char CANSendFrame(unsigned long id, unsigned char priority, unsigned char length, unsigned char *txdata)
+{ 
+  
+  unsigned char txbuffer;
+  int index = 0;
+  
+  DisableInterrupts;
+   
+  if (!CANTFLG)
+  {
+    EnableInterrupts;
+    return ERR_BUFFER_FULL;
+  }/* Is Transmit Buffer full?? */
+    
+  
+  CANTBSEL = CANTFLG; /* Select lowest empty buffer */
+  txbuffer = CANTBSEL; /* Backup selected buffer */
+  
+  /* Load Id to IDR Register */
+  *((unsigned long *) ((unsigned long)(&CANTXIDR0))) = id;
+  
+  for (index=0; index<length; index++) {
+    *(&CANTXDSR0 + index) = txdata[index]; // Load data to Tx buffer
+                                            // Data Segment Registers
+  }
+  
+  CANTXDLR = length; // Set Data Length Code 
+  CANTXTBPR = priority; // Set Priority 
+  CANTFLG = txbuffer; // Start transmission 
+  
+  while ( (CANTFLG & txbuffer) != txbuffer); // Wait for Transmission completion
+  
+  EnableInterrupts;
+  
+  return 0;
+}
+
+void set_moving_flags(void) {
+  
+  //Check recieved message id and set the floor select byte 
+  if ((sender_id == 0x201) && (rxdata[0]&0x01)){                             //First floor id
+       ELEVATOR_INPUT |=OneU_mask;
+  } 
+  if (sender_id == 0x202 && (rxdata[0]&0x01)){                            //second floor id
+       
+	   if(rxdata[0]&UpDown_mask )
+	   {
+	   ELEVATOR_INPUT |=TwoU_mask;
+	   }
+	   else
+	   {
+	   ELEVATOR_INPUT |=TwoD_mask;
+	   }   
+  } 
+  if (sender_id == 0x203 && (rxdata[0]&0x01)){                            //third floor id
+       ELEVATOR_INPUT |=ThreeD_mask;
+  } 
+  if (sender_id == 0x101){                            //elevator control node id(thoma's board)
+       elevator_position = (rxdata[0] & 0b00000011); 	  //Use this value in display function to show the location of elevator
+  } 
+}
+
+
+interrupt 38 void CANRxISR(void)
+{ 
+  unsigned char length, index;  
+ // unsigned char rxdata[8];
+  
+  sender_id = accepted_ID[CANIDAC&0b00000111];
+   
+    
+  length = (CANRXDLR&0x0F);
+  for (index=0; index<length; index++) 
+  {
+    rxdata[index] = *(&CANRXDSR0 + index); // Get received data
+  }
+
+  SET_BITS(CANRFLG,0x01); // Clear RXF, and check for new messages
+}
